@@ -4,24 +4,19 @@ import MemberService from "../models/Member.service";
 import { MemberInput, LoginInput, AdminRequest } from "../libs/types/member";
 import { MemberType } from "../libs/enums/member.enum";
 import Errors, { HttpCode, Message } from "../libs/Errors";
+import ProductService from "../models/Product.service";
+import OrderService from "../models/Order.service";
+import { ProductStatus } from "../libs/enums/product.enum";
 
 // BSSR
 
 const memberService = new MemberService();
+const productService = new ProductService();
+const orderService = new OrderService();
 
 const storeController: T = {};
-// storeController.goHome = (req: Request, res: Response) => {
-//   try {
-//     console.log("goHome");
-//     res.render("home");
-//     // send | json | redirect | end | render => response method turlari
-//   } catch (err) {
-//     console.log("Error, goHome:", err);
-//     res.redirect("/admin");
-//   }
-// };
 
-storeController.goHome = (req: AdminRequest, res: Response) => {
+storeController.goHome = async (req: AdminRequest, res: Response) => {
   try {
     console.log("goHome");
 
@@ -31,13 +26,29 @@ storeController.goHome = (req: AdminRequest, res: Response) => {
       return res.render("home", {});
     }
 
-    // TEMPORARY: hardcoded data, just to review the UI.
-    // Replace with real service calls once the design is approved.
+    const products = await productService.getAllProducts();
+    const users = await memberService.getUsers();
+    const todayOrders = await orderService.getTodayOrders();
+    const revenueToday = todayOrders.reduce((sum, o) => sum + o.orderTotal, 0);
+
+    const lowStockProducts = products
+      .filter(
+        (p) =>
+          p.productStatus === ProductStatus.PROCESS && p.productLeftCount <= 5,
+      )
+      .sort((a, b) => a.productLeftCount - b.productLeftCount)
+      .slice(0, 3);
+
+    const allOrders = await orderService.getAllOrders();
+    const recentOrders = allOrders.slice(0, 4);
+
+    const topCustomers = await memberService.getTopUsers();
+
     res.render("home", {
-      productCount: 128,
-      memberCount: 342,
-      orderCount: 54,
-      revenueToday: 2340,
+      products,
+      users,
+      todayOrders,
+      revenueToday,
       weeklyChart: [
         { label: "Mon", pct: 40 },
         { label: "Tue", pct: 62 },
@@ -47,23 +58,9 @@ storeController.goHome = (req: AdminRequest, res: Response) => {
         { label: "Sat", pct: 90 },
         { label: "Sun", pct: 70 },
       ],
-      lowStockProducts: [
-        { productName: "Bluetooth Speaker Mini", productLeftCount: 0 },
-        { productName: "Wireless Mechanical Keyboard", productLeftCount: 3 },
-        { productName: "4K HDMI Cable 2m", productLeftCount: 5 },
-      ],
-      recentOrders: [
-        { _id: "aaa111", memberNick: "ahmadjon_dev", orderStatus: "PROCESS" },
-        { _id: "bbb222", memberNick: "sara_tech", orderStatus: "PAUSE" },
-        { _id: "ccc333", memberNick: "guest_2024", orderStatus: "FINISH" },
-        { _id: "ddd444", memberNick: "nodir_shop", orderStatus: "PROCESS" },
-      ],
-      topCustomers: [
-        { memberNick: "ahmadjon_dev", memberPoints: 128 },
-        { memberNick: "sara_tech", memberPoints: 96 },
-        { memberNick: "nodir_shop", memberPoints: 74 },
-        { memberNick: "guest_2024", memberPoints: 51 },
-      ],
+      lowStockProducts,
+      recentOrders,
+      topCustomers,
     });
   } catch (err) {
     console.log("Error, goHome:", err);

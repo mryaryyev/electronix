@@ -1,0 +1,82 @@
+<%- include('includes/header') %>
+
+<link rel="stylesheet" type="text/css" href="/css/orders.css" />
+
+<body>
+  <div class="admin-layout">
+    <%- include('includes/sidebar', { active: 'orders' }) %>
+
+    <main class="admin-main">
+      <%- include('includes/topbar') %>
+
+      <div class="content">
+        <div class="admin-topbar">
+          <h1>Orders</h1>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Order list</h2>
+          </div>
+
+          <table class="table table-hover data">
+            <thead class="thead-light">
+              <tr class="thead-light">
+                <th scope="col">No</th>
+                <th scope="col">Order</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Total</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+
+            <% orders.forEach(function(order, index) { %>
+            <tbody>
+              <tr class="order-row">
+                <td><span class="caret">&#9656;</span> <%= index + 1 %></td>
+                <td><span class="order-id">#<%= String(order._id).slice(-6) %></span></td>
+                <td><%= order.memberNick %></td>
+                <td class="money">$<%= order.orderTotal.toFixed(2) %></td>
+                <td><span class="pill <%= order.orderStatus.toLowerCase() %>"><%= order.orderStatus %></span></td>
+              </tr>
+              <tr class="items-row">
+                <td colspan="5">
+                  <div class="items-wrap">
+                    <table class="items">
+                      <thead>
+                        <tr>
+                          <th>Product Name</th>
+                          <th>Item Price</th>
+                          <th>Quantity</th>
+                          <th>Total Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% if(order.items.length === 0) { %>
+                        <tr><td colspan="4">No items found for this order.</td></tr>
+                        <% } %>
+                        <% order.items.forEach(function(item) { %>
+                        <tr>
+                          <td><%= item.productName %></td>
+                          <td>$<%= item.itemPrice.toFixed(2) %></td>
+                          <td><%= item.itemQuantity %></td>
+                          <td>$<%= item.itemTotal.toFixed(2) %></td>
+                        </tr>
+                        <% }) %>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <% }) %>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="text/javascript" src="/js/orders.js"></script>
+</body>
+
+<%- include('includes/footer') %>

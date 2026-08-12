@@ -1,6 +1,7 @@
 import { ObjectId } from "mongoose";
 import { OrderStatus } from "../enums/order.enum";
 import { Product } from "./product";
+import { Member } from "./member";
 
 export interface OrderItem {
   _id: ObjectId;
@@ -41,4 +42,24 @@ export interface OrderInquiry {
 export interface OrderUpdateInput {
   orderId: string;
   orderStatus: OrderStatus;
+}
+
+// Added after Admin UI addition
+export interface AdminOrder extends Order {
+  memberData: Member[];
+}
+
+export interface OrderItemView {
+  productName: string;
+  itemPrice: number;
+  itemQuantity: number;
+  itemTotal: number;
+}
+
+export interface OrderView {
+  _id: ObjectId;
+  memberNick: string;
+  orderTotal: number;
+  orderStatus: OrderStatus;
+  items: OrderItemView[];
 }

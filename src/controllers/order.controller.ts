@@ -10,6 +10,8 @@ const orderService = new OrderService();
 
 const orderController: T = {};
 
+/** SPA */
+
 orderController.createOrder = async (req: ExtendedRequest, res: Response) => {
   try {
     console.log("createOrder");
@@ -56,6 +58,20 @@ orderController.updateOrder = async (req: ExtendedRequest, res: Response) => {
     console.log("Error, updateOrder:", err);
     if (err instanceof Errors) res.status(err.code).json(err);
     else res.status(Errors.standard.code).json(Errors.standard);
+  }
+};
+
+/** BSSR */
+
+orderController.getAllOrders = async (req: Request, res: Response) => {
+  try {
+    console.log("getAllOrders (admin)");
+    const orders = await orderService.getAllOrders();
+
+    res.render("orders", { orders });
+  } catch (err) {
+    console.log("Error, getAllOrders:", err);
+    res.redirect("/admin");
   }
 };
 

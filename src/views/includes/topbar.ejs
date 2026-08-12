@@ -1,0 +1,32 @@
+<div class="topbar">
+  <div class="search-box">
+    <input
+      type="text"
+      id="table-search"
+      class="search-input"
+      placeholder="Search..."
+      autocomplete="off"
+    />
+    <button type="button" class="clear-btn" id="table-search-clear" aria-label="Clear filter" style="display: none">
+      &times;
+    </button>
+    <button type="button" class="search-btn" id="table-search-btn" aria-label="Search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="topbar-right">
+    <div class="icon-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+    </div>
+    <div class="profile">
+      <div class="avatar"><%= member.memberNick.slice(0, 2).toUpperCase() %></div>
+      <div>
+        <div class="name"><%= member.memberNick %></div>
+        <div class="role">Store admin</div>
+      </div>
+    </div>
+  </div>
+</div>

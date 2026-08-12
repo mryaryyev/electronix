@@ -8,29 +8,21 @@
   <% if(!member) { %>
 
   <div class="home-container" id="vanta-bg">
-    <!-- <div class="navigation-menu">
-      <ul class="nav justify-content-center">
-        <li class="nav-item" style="cursor: pointer">
-          <a class="nav-link active" href="/admin">Home</a>
-        </li>
-      </ul>
-    </div> -->
-
-    <div class="hero-content">
-      <span class="eyebrow">Admin Panel</span>
-      <h1 class="brand-title">Electronix</h1>
-      <p class="tagline">
+    <div class="main">
+      <span class="admin-panel">Admin panel</span>
+      <h1 class="project-name">Electronix</h1>
+      <p class="admin-text">
         Manage products, orders and customer accounts for your ELECTRONIX
         STORE
       </p>
-      <div class="cta-row">
-        <div class="cta-col">
-          <span class="cta-caption">Don't have an account?</span>
-          <a class="btn-primary" href="/admin/signup">Sign up</a>
+      <div class="signup-login">
+        <div class="admin-signup-login">
+          <span class="info">Don't have an account?</span>
+          <a class="signup-link" href="/admin/signup">Sign up</a>
         </div>
-        <div class="cta-col">
-          <span class="cta-caption">Already have an account?</span>
-          <a class="link-quiet" href="/admin/login">Log in</a>
+        <div class="admin-signup-login">
+          <span class="info">Already have an account?</span>
+          <a class="login-link" href="/admin/login">Log in</a>
         </div>
       </div>
     </div>
@@ -42,21 +34,7 @@
     <%- include('includes/sidebar', { active: 'overview' }) %>
 
     <main class="admin-main">
-      <div class="topbar">
-        <div class="search-box">Search products, orders, customers...</div>
-        <div class="topbar-right">
-          <div class="icon-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-          </div>
-          <div class="profile">
-            <div class="avatar"><%= member.memberNick.slice(0, 2).toUpperCase() %></div>
-            <div>
-              <div class="name"><%= member.memberNick %></div>
-              <div class="role">Store admin</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <%- include('includes/topbar') %>
 
       <div class="content">
         <div class="admin-topbar">
@@ -67,15 +45,15 @@
         <div class="stat-grid">
           <div class="stat-card">
             <div class="label">Products</div>
-            <div class="value"><%= productCount %></div>
+            <div class="value"><%= products.length %></div>
           </div>
           <div class="stat-card">
             <div class="label">Customers</div>
-            <div class="value"><%= memberCount %></div>
+            <div class="value"><%= users.length %></div>
           </div>
           <div class="stat-card">
             <div class="label">Orders today</div>
-            <div class="value"><%= orderCount %></div>
+            <div class="value"><%= todayOrders.length %></div>
           </div>
           <div class="stat-card">
             <div class="label">Revenue today</div>

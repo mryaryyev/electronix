@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     scale: 1.0,
     scaleMobile: 1.0,
     color: 0xc97c3d,
-    backgroundColor: 0x0f2e22,
+    backgroundColor: 0x234f3c,
     points: 10,
     maxDistance: 20,
     spacing: 15,

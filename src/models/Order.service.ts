@@ -13,6 +13,9 @@ import OrderItemModel from "../schema/OrderItem.model";
 import { ObjectId } from "mongoose";
 import MemberService from "./Member.service";
 
+import { AdminOrder, OrderView } from "../libs/types/order";
+import moment from "moment";
+
 class OrderService {
   private readonly orderModel;
   private readonly orderItemModel;
@@ -133,6 +136,67 @@ class OrderService {
       await this.memberService.addUserPoint(member, 1);
     }
     return result;
+  }
+
+  //Orders UI uchun
+  public async getAllOrders(): Promise<OrderView[]> {
+    const result: AdminOrder[] = await this.orderModel
+      .aggregate([
+        { $sort: { createdAt: -1 } },
+        {
+          $lookup: {
+            from: "members",
+            localField: "memberId",
+            foreignField: "_id",
+            as: "memberData",
+          },
+        },
+        {
+          $lookup: {
+            from: "orderItems",
+            localField: "_id",
+            foreignField: "orderId",
+            as: "orderItems",
+          },
+        },
+        {
+          $lookup: {
+            from: "products",
+            localField: "orderItems.productId",
+            foreignField: "_id",
+            as: "productData",
+          },
+        },
+      ])
+      .exec();
+
+    if (!result) throw new Errors(HttpCode.NOT_FOUND, Message.NO_DATA_FOUND);
+
+    return result.map((order) => ({
+      _id: order._id,
+      memberNick: order.memberData[0].memberNick,
+      orderTotal: order.orderTotal,
+      orderStatus: order.orderStatus,
+      items: order.orderItems.map((item) => {
+        const product = order.productData.find(
+          (p) => String(p._id) === String(item.productId),
+        )!;
+        return {
+          productName: product.productName,
+          itemPrice: item.itemPrice,
+          itemQuantity: item.itemQuantity,
+          itemTotal: item.itemPrice * item.itemQuantity,
+        };
+      }),
+    }));
+  }
+
+  // Home UI / dayly Orders uchun
+  public async getTodayOrders(): Promise<Order[]> {
+    const startOfDay = moment().startOf("day").toDate();
+    return await this.orderModel
+      .find({ createdAt: { $gte: startOfDay } })
+      .exec();
   }
 }
 
