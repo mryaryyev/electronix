@@ -131,6 +131,19 @@
               <label>Product Description</label>
               <textarea name="productDesc" class="product-desc"></textarea>
             </div>
+            <div class="long-input">
+            <label>Product Specs (Key Features)</label>
+            <div id="specs-container">
+             <div class="spec-row">
+              <input type="text" class="spec-key" placeholder="e.g. Display" />
+              <input type="text" class="spec-value" placeholder="e.g. 13.6 inches Retina" />
+            <button type="button" class="btn btn-danger remove-spec-btn">✕</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" id="add-spec-btn">+ Add Spec</button>
+</div>
+
+<input type="hidden" name="productSpecs" id="product-specs-hidden" />
 
             <div class="img-frame">
               <label>Product Images</label>

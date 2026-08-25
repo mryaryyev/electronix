@@ -1,17 +1,6 @@
 console.log("Products frontend javascript file");
 
 $(function () {
-  $(".product-collection").on("change", () => {
-    const selectedValue = $(".product-collection").val();
-    if (selectedValue === "DRINK") {
-      $("#product-collection").hide();
-      $("#product-volume").show();
-    } else {
-      $("#product-volume").hide();
-      $("#product-collection").show();
-    }
-  });
-
   $("#process-btn").on("click", () => {
     $(".dish-container").slideToggle(500);
     $("#process-btn").css("display", "none");
@@ -42,13 +31,31 @@ $(function () {
       alert("Product update failed!");
     }
   });
+
+  /** Yeni bir spec (key-value) satırı ekle **/
+  $("#add-spec-btn").on("click", () => {
+    const row = `
+      <div class="spec-row">
+        <input type="text" class="spec-key" placeholder="e.g. RAM" />
+        <input type="text" class="spec-value" placeholder="e.g. 16GB" />
+        <button type="button" class="btn btn-danger remove-spec-btn">✕</button>
+      </div>
+    `;
+    $("#specs-container").append(row);
+  });
+
+  /** Bir spec satırını sil (dinamik eklenen satırlar için event delegation) **/
+  $("#specs-container").on("click", ".remove-spec-btn", function () {
+    $(this).closest(".spec-row").remove();
+  });
 });
 
 function validateForm() {
   const productName = $(".product-name").val();
   const productPrice = $(".product-price").val();
   const productLeftCount = $(".product-left-count").val();
-  const productCollection = $(".product-collection").val();
+  const productCategory = $(".product-category").val();
+  const productBrand = $(".product-brand").val();
   const productDesc = $(".product-desc").val();
   const productStatus = $(".product-status").val();
 
@@ -56,13 +63,27 @@ function validateForm() {
     productName === "" ||
     productPrice === "" ||
     productLeftCount === "" ||
-    productCollection === "" ||
+    productCategory === "" ||
+    productBrand === "" ||
     productDesc === "" ||
     productStatus === ""
   ) {
     alert("Please insert all required inputs");
     return false;
-  } else return true;
+  }
+
+  /** Tüm spec satırlarını topla, JSON objesine çevir, hidden input'a yaz **/
+  const specs = {};
+  $(".spec-row").each(function () {
+    const key = $(this).find(".spec-key").val().trim();
+    const value = $(this).find(".spec-value").val().trim();
+    if (key && value) {
+      specs[key] = value;
+    }
+  });
+  $("#product-specs-hidden").val(JSON.stringify(specs));
+
+  return true;
 }
 
 function previewFileHandler(input, order) {
