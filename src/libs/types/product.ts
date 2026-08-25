@@ -4,6 +4,7 @@ import {
   ProductCategory,
   ProductStatus,
 } from "../enums/product.enum";
+import { T } from "./common";
 
 export interface Product {
   _id: ObjectId;
@@ -13,7 +14,7 @@ export interface Product {
   productName: string;
   productPrice: number;
   productLeftCount: number;
-  productSpecs?: Record<string, any>;
+  productSpecs?: T;
   productDesc?: string;
   productImages: string[];
   productViews: number;
@@ -28,6 +29,8 @@ export interface ProductInquiry {
   productCategory?: ProductCategory;
   productBrand?: ProductBrand;
   search?: string;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export interface ProductInput {
@@ -37,7 +40,7 @@ export interface ProductInput {
   productName: string;
   productPrice: number;
   productLeftCount: number;
-  productSpecs?: Record<string, any>;
+  productSpecs?: T;
   productDesc?: string;
   productImages?: string[];
   productViews?: number;
@@ -51,7 +54,7 @@ export interface ProductUpdateInput {
   productName?: string;
   productPrice?: number;
   productLeftCount?: number;
-  productSpecs?: Record<string, any>;
+  productSpecs?: T;
   productDesc?: string;
   productImages?: string[];
   productViews?: number;

@@ -30,8 +30,14 @@ class ProductService {
 
     if (inquiry.productCategory)
       match.productCategory = inquiry.productCategory;
+    if (inquiry.productBrand) match.productBrand = inquiry.productBrand;
     if (inquiry.search) {
       match.productName = { $regex: new RegExp(inquiry.search, "i") }; //"i" => bu FLAG
+    }
+    if (inquiry.minPrice || inquiry.maxPrice) {
+      match.productPrice = {};
+      if (inquiry.minPrice) match.productPrice.$gte = inquiry.minPrice;
+      if (inquiry.maxPrice) match.productPrice.$lte = inquiry.maxPrice;
     }
 
     const sort: T =

@@ -4,7 +4,7 @@ import { T } from "../libs/types/common";
 import ProductService from "../models/Product.service";
 import { ProductInput, ProductInquiry } from "../libs/types/product";
 import { AdminRequest, ExtendedRequest } from "../libs/types/member";
-import { ProductCategory } from "../libs/enums/product.enum";
+import { ProductBrand, ProductCategory } from "../libs/enums/product.enum";
 
 const productService = new ProductService();
 
@@ -19,7 +19,16 @@ productController.getProducts = async (req: Request, res: Response) => {
 
     // const params = req.params;
     // console.log("req.params: ", params);
-    const { page, limit, order, productCategory, search } = req.query;
+    const {
+      page,
+      limit,
+      order,
+      productCategory,
+      productBrand,
+      search,
+      minPrice,
+      maxPrice,
+    } = req.query;
     // console.log(`page: ${page}, order: ${order}`)
     const inquiry: ProductInquiry = {
       order: String(order),
@@ -29,7 +38,12 @@ productController.getProducts = async (req: Request, res: Response) => {
     if (productCategory) {
       inquiry.productCategory = productCategory as ProductCategory;
     }
+    if (productBrand) {
+      inquiry.productBrand = productBrand as ProductBrand;
+    }
     if (search) inquiry.search = String(search);
+     if (minPrice) inquiry.minPrice = Number(minPrice);
+    if (maxPrice) inquiry.maxPrice = Number(maxPrice);
 
     const result = await productService.getProducts(inquiry);
 
@@ -87,6 +101,14 @@ productController.createNewProduct = async (
     data.productImages = req.files?.map((ele) => {
       return ele.path;
     });
+
+    if (data.productSpecs && typeof data.productSpecs === "string") {
+      try {
+        data.productSpecs = JSON.parse(data.productSpecs);
+      } catch (err) {
+        data.productSpecs = {};
+      }
+    }
 
     await productService.createNewProduct(data);
     res.send(
