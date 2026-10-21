@@ -5,6 +5,7 @@ import ProductService from "../models/Product.service";
 import { ProductInput, ProductInquiry } from "../libs/types/product";
 import { AdminRequest, ExtendedRequest } from "../libs/types/member";
 import { ProductBrand, ProductCategory } from "../libs/enums/product.enum";
+import { processAndSaveImage } from "../libs/utils/imageProcessor";
 
 const productService = new ProductService();
 
@@ -42,7 +43,7 @@ productController.getProducts = async (req: Request, res: Response) => {
       inquiry.productBrand = productBrand as ProductBrand;
     }
     if (search) inquiry.search = String(search);
-     if (minPrice) inquiry.minPrice = Number(minPrice);
+    if (minPrice) inquiry.minPrice = Number(minPrice);
     if (maxPrice) inquiry.maxPrice = Number(maxPrice);
 
     const result = await productService.getProducts(inquiry);
@@ -98,9 +99,13 @@ productController.createNewProduct = async (
       throw new Errors(HttpCode.INTERNAL_SERVER_ERROR, Message.CREATE_FAILED);
 
     const data: ProductInput = req.body;
-    data.productImages = req.files?.map((ele) => {
-      return ele.path;
-    });
+
+    const files = req.files as Express.Multer.File[];
+    data.productImages = await Promise.all(
+      files.map((file) =>
+        processAndSaveImage(file.buffer, file.originalname, "products"),
+      ),
+    );
 
     if (data.productSpecs && typeof data.productSpecs === "string") {
       try {
@@ -124,12 +129,25 @@ productController.createNewProduct = async (
   }
 };
 
-productController.updateChosenProduct = async (req: Request, res: Response) => {
+productController.updateChosenProduct = async (
+  req: ExtendedRequest,
+  res: Response,
+) => {
   try {
     console.log("updateChosenProduct");
     const id = req.params.id as string;
+    const data = req.body;
 
-    const result = await productService.updateChosenProduct(id, req.body);
+    if (req.files?.length) {
+      const files = req.files as Express.Multer.File[];
+      data.productImages = await Promise.all(
+        files.map((file) =>
+          processAndSaveImage(file.buffer, file.originalname, "products"),
+        ),
+      );
+    }
+
+    const result = await productService.updateChosenProduct(id, data);
 
     res.status(HttpCode.OK).json({ data: result });
   } catch (err) {

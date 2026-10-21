@@ -7,6 +7,7 @@ import Errors, { HttpCode, Message } from "../libs/Errors";
 import ProductService from "../models/Product.service";
 import OrderService from "../models/Order.service";
 import { ProductStatus } from "../libs/enums/product.enum";
+import { processAndSaveImage } from "../libs/utils/imageProcessor";
 
 // BSSR
 
@@ -97,7 +98,12 @@ storeController.processSignup = async (req: AdminRequest, res: Response) => {
       throw new Errors(HttpCode.BAD_REQUEST, Message.SOMETHING_WENT_WRONG);
 
     const newMember: MemberInput = req.body;
-    newMember.memberImage = file?.path;
+    newMember.memberImage = await processAndSaveImage(
+      file.buffer,
+      file.originalname,
+      "members",
+      { width: 300, height: 300, fit: "cover" },
+    );
     newMember.memberType = MemberType.STORE;
     const result = await memberService.processSignup(newMember);
 

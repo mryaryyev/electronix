@@ -14,7 +14,7 @@ routerAdmin
   .get("/signup", storeController.getSignup)
   .post(
     "/signup",
-    makeUploader("members").single("memberImage"),
+    makeUploader().single("memberImage"),
     storeController.processSignup,
   );
 routerAdmin.get("/logout", storeController.logout);
@@ -30,12 +30,13 @@ routerAdmin.post(
   "/product/create",
   storeController.verifyStore,
   //uploadProductImage.single('productImage'),
-  makeUploader("products").array("productImages", 5),
+  makeUploader().array("productImages", 5),
   productController.createNewProduct,
 );
 routerAdmin.post(
   "/product/:id",
   storeController.verifyStore,
+  makeUploader().array("productImages", 5),
   productController.updateChosenProduct,
 );
 

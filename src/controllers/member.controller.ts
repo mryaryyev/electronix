@@ -10,6 +10,7 @@ import {
 import MemberService from "../models/Member.service";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import AuthService from "../models/Auth.service";
+import { processAndSaveImage } from "../libs/utils/imageProcessor";
 import { AUTH_TIMER } from "../libs/config";
 
 const memberService = new MemberService();
@@ -107,7 +108,13 @@ memberController.updateMember = async (req: ExtendedRequest, res: Response) => {
     console.log("updateMember");
 
     const input: MemberUpdateInput = req.body;
-    if (req.file) input.memberImage = req.file.path;
+    if (req.file)
+      input.memberImage = await processAndSaveImage(
+        req.file.buffer,
+        req.file.originalname,
+        "members",
+        { width: 300, height: 300, fit: "cover" },
+      );
 
     const result = await memberService.updateMember(req.member, input);
 
