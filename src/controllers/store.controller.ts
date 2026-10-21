@@ -41,7 +41,7 @@ storeController.goHome = async (req: AdminRequest, res: Response) => {
       .slice(0, 3);
 
     const allOrders = await orderService.getAllOrders();
-    const recentOrders = allOrders.slice(0, 4);
+    const recentOrders = allOrders.slice(0, 5);
 
     const topCustomers = await memberService.getTopUsers();
 

@@ -177,17 +177,20 @@ class OrderService {
       memberNick: order.memberData[0].memberNick,
       orderTotal: order.orderTotal,
       orderStatus: order.orderStatus,
-      items: order.orderItems.map((item) => {
-        const product = order.productData.find(
-          (p) => String(p._id) === String(item.productId),
-        )!;
-        return {
-          productName: product.productName,
-          itemPrice: item.itemPrice,
-          itemQuantity: item.itemQuantity,
-          itemTotal: item.itemPrice * item.itemQuantity,
-        };
-      }),
+      items: order.orderItems
+        .map((item) => {
+          const product = order.productData.find(
+            (p) => String(p._id) === String(item.productId),
+          );
+          if (!product) return null;
+          return {
+            productName: product.productName,
+            itemPrice: item.itemPrice,
+            itemQuantity: item.itemQuantity,
+            itemTotal: item.itemPrice * item.itemQuantity,
+          };
+        })
+        .filter((item) => item !== null),
     }));
   }
 
