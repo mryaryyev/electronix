@@ -103,7 +103,9 @@ productController.createNewProduct = async (
     const files = req.files as Express.Multer.File[];
     data.productImages = await Promise.all(
       files.map((file) =>
-        processAndSaveImage(file.buffer, file.originalname, "products"),
+        processAndSaveImage(file.buffer, file.originalname, "products", {
+          normalize: true,
+        }),
       ),
     );
 
@@ -142,7 +144,9 @@ productController.updateChosenProduct = async (
       const files = req.files as Express.Multer.File[];
       data.productImages = await Promise.all(
         files.map((file) =>
-          processAndSaveImage(file.buffer, file.originalname, "products"),
+          processAndSaveImage(file.buffer, file.originalname, "products", {
+            normalize: true,
+          }),
         ),
       );
     }
