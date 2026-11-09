@@ -11,7 +11,7 @@ import MemberService from "../models/Member.service";
 import Errors, { HttpCode, Message } from "../libs/Errors";
 import AuthService from "../models/Auth.service";
 import { processAndSaveImage } from "../libs/utils/imageProcessor";
-import { AUTH_TIMER } from "../libs/config";
+import { getCookieOptions } from "../libs/config";
 
 const memberService = new MemberService();
 const authService = new AuthService();
@@ -40,10 +40,7 @@ memberController.signup = async (req: Request, res: Response) => {
     const token = await authService.createToken(result);
     //console.log("token=>", token);
 
-    res.cookie("accessToken", token, {
-      maxAge: AUTH_TIMER * 3600 * 1000,
-      httpOnly: false,
-    });
+    res.cookie("accessToken", token, getCookieOptions());
 
     res.status(HttpCode.CREATED).json({ member: result, accessToken: token });
   } catch (err) {
@@ -62,10 +59,7 @@ memberController.login = async (req: Request, res: Response) => {
       token = await authService.createToken(result);
     //console.log("token=>", token);
 
-    res.cookie("accessToken", token, {
-      maxAge: AUTH_TIMER * 3600 * 1000,
-      httpOnly: false,
-    });
+    res.cookie("accessToken", token, getCookieOptions());
 
     res.status(HttpCode.OK).json({ member: result, accessToken: token });
   } catch (err) {
@@ -78,7 +72,7 @@ memberController.login = async (req: Request, res: Response) => {
 memberController.logout = (req: ExtendedRequest, res: Response) => {
   try {
     console.log("logout");
-    res.cookie("accessToken", null, { maxAge: 0, httpOnly: true });
+    res.cookie("accessToken", null, getCookieOptions(0));
     res.status(HttpCode.OK).json({ logout: true });
   } catch (err) {
     console.log("Error, logout:", err);
