@@ -92,7 +92,6 @@ storeController.getLogin = (req: Request, res: Response) => {
 storeController.processSignup = async (req: AdminRequest, res: Response) => {
   try {
     console.log("processSignup");
-    console.log(req.body);
     const file = req.file;
     if (!file)
       throw new Errors(HttpCode.BAD_REQUEST, Message.SOMETHING_WENT_WRONG);
@@ -104,7 +103,6 @@ storeController.processSignup = async (req: AdminRequest, res: Response) => {
       "members",
       { width: 300, height: 300, fit: "cover" },
     );
-    newMember.memberType = MemberType.STORE;
     const result = await memberService.processSignup(newMember);
 
     req.session.member = result;

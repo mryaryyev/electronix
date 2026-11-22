@@ -10,6 +10,15 @@ import { MemberStatus, MemberType } from "../libs/enums/member.enum";
 import * as bcrypt from "bcryptjs";
 import { shapeIntoMongooseObjectId } from "../libs/config";
 
+/** What members may change on their own profile. */
+const PROFILE_FIELDS = [
+  "memberNick",
+  "memberPhone",
+  "memberAddress",
+  "memberDesc",
+  "memberImage",
+] as const;
+
 class MemberService {
   private readonly memberModel;
   constructor() {
@@ -31,10 +40,16 @@ class MemberService {
 
   public async signup(input: MemberInput): Promise<Member> {
     const salt = await bcrypt.genSalt();
-    input.memberPassword = await bcrypt.hash(input.memberPassword, salt);
+    // the role is never taken from the request
+    const newMember: MemberInput = {
+      memberNick: input.memberNick,
+      memberPhone: input.memberPhone,
+      memberPassword: await bcrypt.hash(input.memberPassword, salt),
+      memberType: MemberType.USER,
+    };
 
     try {
-      const result = await this.memberModel.create(input);
+      const result = await this.memberModel.create(newMember);
       result.memberPassword = "";
       return result.toJSON();
     } catch (err) {
@@ -86,8 +101,13 @@ class MemberService {
     input: MemberUpdateInput,
   ): Promise<Member> {
     const memberId = shapeIntoMongooseObjectId(member._id);
+    // profile fields only: role, status and points are never taken from the request
+    const update: Partial<MemberUpdateInput> = {};
+    for (const key of PROFILE_FIELDS)
+      if (input[key] !== undefined) update[key] = input[key];
+
     const result = await this.memberModel
-      .findOneAndUpdate({ _id: memberId }, input, { new: true })
+      .findOneAndUpdate({ _id: memberId }, update, { new: true })
       .exec();
     if (!result) throw new Errors(HttpCode.NOT_MODIFIED, Message.UPDATE_FAILED);
 
@@ -130,13 +150,17 @@ class MemberService {
       .exec();
     if (exist) throw new Errors(HttpCode.BAD_REQUEST, Message.CREATE_FAILED);
 
-    console.log("before:", input.memberPassword);
     const salt = await bcrypt.genSalt();
-    input.memberPassword = await bcrypt.hash(input.memberPassword, salt);
-    console.log("after:", input.memberPassword);
+    const store: MemberInput = {
+      memberNick: input.memberNick,
+      memberPhone: input.memberPhone,
+      memberImage: input.memberImage,
+      memberPassword: await bcrypt.hash(input.memberPassword, salt),
+      memberType: MemberType.STORE,
+    };
 
     try {
-      const result = await this.memberModel.create(input);
+      const result = await this.memberModel.create(store);
       result.memberPassword = "";
       return result;
     } catch (err) {
